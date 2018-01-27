@@ -20,4 +20,4 @@ Weaver weaves a spider tapesty of your favorite bitmap image.
 
 Hit END to stop the process early. END again to exit.
 
-![screenshot](scrots/2018-01-27-135938_600x768_scrot.png)
+![screenshot](scrots/2018-01-27-142016_600x768_scrot.png)

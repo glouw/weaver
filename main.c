@@ -32,7 +32,7 @@ typedef struct
 }
 Points;
 
-const Point zero = { 0.0, 0.0 }, one = { 1.0, 1.0 };
+const Point zero = { 0.0f, 0.0f }, one = { 1.0f, 1.0f };
 
 static Tris tsnew(const int max)
 {
@@ -68,7 +68,7 @@ static int incircum(const Tri t, const Point p)
         (ax * ax + ay * ay) * (bx * cy - cx * by) -
         (bx * bx + by * by) * (ax * cy - cx * ay) +
         (cx * cx + cy * cy) * (ax * by - bx * ay);
-    return det > 0.0;
+    return det > 0.0f;
 }
 
 // Collects all edges from given triangles.
@@ -146,7 +146,7 @@ static uint32_t conv(uint32_t* p, const int x, const int y, const int w, const i
         (0xFF & k[1][2] * (p[(x + 1) + (y - 0) * w] >> s)) +
         (0xFF & k[2][0] * (p[(x - 1) + (y + 1) * w] >> s)) +
         (0xFF & k[2][1] * (p[(x - 0) + (y + 1) * w] >> s)) +
-        (0xFF & k[2][2] * (p[(x + 1) + (y + 1) * w] >> s))) / 9.0;
+        (0xFF & k[2][2] * (p[(x + 1) + (y + 1) * w] >> s))) / 9.0f;
 }
 
 static uint32_t* blur(uint32_t* p, const int w, const int h)
@@ -157,7 +157,7 @@ static uint32_t* blur(uint32_t* p, const int w, const int h)
         { 1, 1, 1 },
     };
     const int bytes = sizeof(*p) * w * h;
-    uint32_t* out = memcpy((uint32_t*) malloc(bytes), p, bytes);
+    uint32_t* out = (uint32_t*) memcpy(malloc(bytes), p, bytes);
     for(int x = 1; x < w - 1; x++)
     for(int y = 1; y < h - 1; y++)
         out[x + y * w] =
@@ -170,7 +170,7 @@ static uint32_t* blur(uint32_t* p, const int w, const int h)
 static uint32_t* grey(uint32_t* p, const int w, const int h)
 {
     const int bytes = sizeof(*p) * w * h;
-    uint32_t* out = memcpy((uint32_t*) malloc(bytes), p, bytes);
+    uint32_t* out = (uint32_t*) memcpy(malloc(bytes), p, bytes);
     for(int x = 1; x < w - 1; x++)
     for(int y = 1; y < h - 1; y++)
     {
@@ -193,7 +193,7 @@ static uint32_t* soblx(uint32_t* p, const int w, const int h)
         { -1, 0, 1 },
     };
     const int bytes = sizeof(*p) * w * h;
-    uint32_t* out = memcpy((uint32_t*) malloc(bytes), p, bytes);
+    uint32_t* out = (uint32_t*) memcpy(malloc(bytes), p, bytes);
     for(int x = 1; x < w - 1; x++)
     for(int y = 1; y < h - 1; y++)
         out[x + y * w] =
@@ -211,7 +211,7 @@ static uint32_t* sobly(uint32_t* p, const int w, const int h)
         { -1, -2, -1 },
     };
     const int bytes = sizeof(*p) * w * h;
-    uint32_t* out = memcpy((uint32_t*) malloc(bytes), p, bytes);
+    uint32_t* out = (uint32_t*) memcpy(malloc(bytes), p, bytes);
     for(int x = 1; x < w - 1; x++)
     for(int y = 1; y < h - 1; y++)
         out[x + y * w] =
@@ -226,7 +226,7 @@ static uint32_t* sobl(uint32_t* p, const int w, const int h)
     uint32_t* sx = soblx(p, w, h);
     uint32_t* sy = sobly(p, w, h);
     const int bytes = sizeof(*p) * w * h;
-    uint32_t* out = memcpy((uint32_t*) malloc(bytes), p, bytes);
+    uint32_t* out = (uint32_t*) memcpy(malloc(bytes), p, bytes);
     for(int x = 1; x < w - 1; x++)
     for(int y = 1; y < h - 1; y++)
     {
@@ -248,7 +248,7 @@ static uint32_t* sobl(uint32_t* p, const int w, const int h)
 static uint32_t* nett(uint32_t* p, const int w, const int h, const uint32_t thresh)
 {
     const int bytes = sizeof(*p) * w * h;
-    uint32_t* out = memcpy((uint32_t*) malloc(bytes), p, bytes);
+    uint32_t* out = (uint32_t*) memcpy(malloc(bytes), p, bytes);
     for(int x = 1; x < w - 1; x++)
     for(int y = 1; y < h - 1; y++)
     {
@@ -273,8 +273,8 @@ static void draw(SDL_Renderer* const renderer, const int w, const int h, const T
     for(int i = 0; i < tris.count; i++)
     {
         const Tri t = tris.tri[i];
-        const int x = t.a.x + (t.b.x - t.a.x) / 2.0;
-        const int y = t.b.y + (t.c.y - t.b.y) / 2.0;
+        const int x = t.a.x + (t.b.x - t.a.x) / 2.0f;
+        const int y = t.b.y + (t.c.y - t.b.y) / 2.0f;
         const uint32_t color = outob(x, y, w, h) ? 0x00 : regular[x + y * w];
         filledTrigonColor(renderer,
                 t.a.x, t.a.y, t.b.x, t.b.y, t.c.x, t.c.y,
@@ -291,7 +291,7 @@ static void delaunay(SDL_Renderer* const renderer, const Points ps, const int w,
     Tris tris = tsnew(size);
     Tris edges = tsnew(size);
     // The super triangle will snuggley fit over the screen.
-    const Tri super = { { -w, 0.0 }, { 2 * w, 0.0 }, { w / 2, 2 * h } };
+    const Tri super = { { (float) -w, 0.0f }, { 2.0f * w, 0.0f }, { w / 2.0f, 2.0f * h } };
     tris = tsadd(tris, super);
     for(int j = 0; j < ps.count; j++)
     {
@@ -320,7 +320,7 @@ static void delaunay(SDL_Renderer* const renderer, const Points ps, const int w,
         tris = out;
         // Loading bar.
         if(j % 100 == 0)
-            printf("%2.0f%%\n", 100.0 * (j / (float) ps.count));
+            printf("%2.0f%%\n", 100.0 * (j / (double) ps.count));
     }
     // Draw all triangles.
     draw(renderer, w, h, tris, regular);
@@ -340,7 +340,10 @@ static Points pcollect(uint32_t* netted, const int w, const int h, const uint32_
     for(int y = 1; y < h - 1; y++)
         if(netted[x + w * y] > thresh)
         {
-            const Point p = { x, y };
+            const Point p = {
+                (float) x,
+                (float) y,
+            };
             ps.point[ps.count++] = p;
         }
     return ps;

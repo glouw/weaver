@@ -1,5 +1,5 @@
 # Compiler and standard.
-CC = gcc -std=c99
+CC = g++ #-std=c99
 
 # Project name.
 PROJ = weaver
@@ -8,13 +8,13 @@ PROJ = weaver
 SRCS = main.c
 
 # Warnings flags.
-CFLAGS = -Wshadow -Wall -Wpedantic -Wextra
+CFLAGS+= -Wshadow -Wall -Wpedantic -Wextra -Wdouble-promotion
 
 # Debugging flags.
 CFLAGS+= -g
 
 # Optimization flags.
-CFLAGS+= -Ofast -march=native -fsingle-precision-constant
+CFLAGS+= -Ofast -march=native
 
 # Linker flags.
 LDFLAGS = -lm -lSDL2 -lSDL2_gfx
