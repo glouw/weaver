@@ -1,9 +1,5 @@
-// The SDL Graphicx Primitives header is included as an additional dependency.
-// (I was too lazy to software fill triangles by hand), but its still a lot
-// more portable than bare-naked OpenGL.
-
 #include <SDL2/SDL.h>
-#include <SDL2/SDL2_gfxPrimitives.h> 
+#include <SDL2/SDL2_gfxPrimitives.h>
 
 typedef struct
 {
