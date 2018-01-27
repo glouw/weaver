@@ -117,7 +117,7 @@ static Tris ejoin(Tris tris, const Tris edges, const Point p)
 static SDL_Surface* load(const char* const path)
 {
     SDL_Surface* const bmp = SDL_LoadBMP(path);
-    SDL_PixelFormat* const allocation = SDL_AllocFormat(SDL_PIXELFORMAT_RGB888);
+    SDL_PixelFormat* const allocation = SDL_AllocFormat(SDL_PIXELFORMAT_ABGR8888);
     SDL_Surface* const converted = SDL_ConvertSurface(bmp, allocation, 0);
     SDL_FreeFormat(allocation);
     SDL_FreeSurface(bmp);
@@ -293,7 +293,7 @@ static void dt(SDL_Renderer* const renderer, const Point* points, const int len,
         const int x = t.a.x + (t.b.x - t.a.x) / 2.0;
         const int y = t.b.y + (t.c.y - t.b.y) / 2.0;
         const uint32_t color = regular[x + y * w];
-        filledTrigonColor(renderer, t.a.x, t.a.y, t.b.x, t.b.y, t.c.x, t.c.y, color << 8);
+        filledTrigonColor(renderer, t.a.x, t.a.y, t.b.x, t.b.y, t.c.x, t.c.y, (0xFF << 24) | color);
     }
     SDL_RenderPresent(renderer);
     SDL_Delay(10000);
