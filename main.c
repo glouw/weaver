@@ -287,7 +287,7 @@ static void draw(SDL_Renderer* const renderer, const int w, const int h, const T
     }
 }
 
-static void delaunay(SDL_Renderer* const renderer, const Points ps, const int w, const int h, uint32_t* regular)
+static void delaunay(SDL_Renderer* const renderer, const Points ps, const int w, const int h, uint32_t* regular, const uint8_t* key)
 {
     const int size = w * h / 3; /* "Big enough" rough approximation. */
     Tris in = tsnew(size);
@@ -299,6 +299,9 @@ static void delaunay(SDL_Renderer* const renderer, const Points ps, const int w,
     tris = tsadd(tris, super);
     for(int j = 0; j < ps.count; j++)
     {
+        SDL_PumpEvents();
+        if(key[SDL_SCANCODE_END])
+            break;
         in.count = out.count = edges.count = 0;
         const Point p = ps.point[j];
         // For all triangles...
@@ -347,15 +350,21 @@ static Points pcollect(uint32_t* netted, const int w, const int h, const uint32_
     return ps;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-    const uint32_t thresh = 128;
-    SDL_Surface* surface = load("geralt.bmp");
+    if(argc != 3)
+    {
+        puts("weaver path/to/image threshold");
+        return 1;
+    }
+    SDL_Surface* surface = load(argv[1]);
+    const uint32_t thresh = atoi(argv[2]);
     SDL_Window* window;
     SDL_Renderer* renderer;
     const int w = surface->w;
     const int h = surface->h;
     SDL_CreateWindowAndRenderer(w, h, 0, &window, &renderer);
+    const uint8_t* key = SDL_GetKeyboardState(NULL);
     // Before we get to the delaunay triangles,
     // the image is first blurred, then grey scaled, then sobel filtered for edge detection,
     // and then finally netted with a threshold [0, 255] to yield more or less triangles.
@@ -367,8 +376,9 @@ int main()
     uint32_t* e = nett(d, w, h, thresh);
     const Points ps = pcollect(e, w, h, thresh);
     // Note that the original image is used for coloring delaunay triangles.
-    delaunay(renderer, ps, w, h, a);
+    delaunay(renderer, ps, w, h, a, key);
+    // Present and wait afor the user to hit the END key.
     SDL_RenderPresent(renderer);
-    SDL_Delay(10000);
+    do { SDL_PumpEvents(); } while(!key[SDL_SCANCODE_END]);
     // No need to free hoisted memory - gives a fast exit.
 }
