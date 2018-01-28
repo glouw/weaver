@@ -369,7 +369,7 @@ int main(int argc, char* argv[])
     // Before we get to the delaunay triangles,
     // the image is first blurred, then grey scaled, then sobel filtered for edge detection,
     // and then finally netted with a threshold [0, 255] to yield more or less triangles.
-    // The pipeline is labeled with the first few letters of hte alphabet.
+    // The pipeline is labeled with the first few letters of the alphabet.
     uint32_t* const a = (uint32_t*) surface->pixels;
     uint32_t* const b = blur(a, w, h);
     uint32_t* const c = grey(b, w, h);
@@ -378,7 +378,7 @@ int main(int argc, char* argv[])
     const Points ps = pcollect(e, w, h, thresh);
     // Note that the original image is used for coloring delaunay triangles.
     delaunay(renderer, ps, w, h, a, key);
-    // Present and wait afor the user to hit the END key.
+    // Present and wait for the user to hit the END key.
     SDL_RenderPresent(renderer);
     do { SDL_PumpEvents(); } while(!key[SDL_SCANCODE_END]);
     // No need to free hoisted memory - gives a fast exit.
