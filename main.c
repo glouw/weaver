@@ -1,5 +1,4 @@
 #include <SDL2/SDL.h>
-#include <SDL2/SDL2_gfxPrimitives.h>
 #include <SDL2/SDL_image.h>
 
 typedef struct
@@ -282,12 +281,14 @@ static void draw(SDL_Renderer* const renderer, const int w, const int h, const T
         const int x = (t.a.x + t.b.x + t.c.x) / 3.0f;
         const int y = (t.a.y + t.b.y + t.c.y) / 3.0f;
         const uint32_t color = outob(x, y, w, h) ? 0x00 : regular[x + y * w];
-        aatrigonColor(renderer,
-                t.a.x, t.a.y,
-                t.b.x, t.b.y,
-                t.c.x, t.c.y,
-                // Force alpha to opaque just incase its completely transparent.
-                (0xFF << 24) | color);
+        const uint32_t r = (color >> 0x00) & 0xFF;
+        const uint32_t g = (color >> 0x08) & 0xFF;
+        const uint32_t b = (color >> 0x10) & 0xFF;
+        const uint32_t a = 0xFF;
+        SDL_SetRenderDrawColor(renderer, r, g, b, a);
+        SDL_RenderDrawLine(renderer, t.a.x, t.a.y, t.b.x, t.b.y);
+        SDL_RenderDrawLine(renderer, t.b.x, t.b.y, t.c.x, t.c.y);
+        SDL_RenderDrawLine(renderer, t.c.x, t.c.y, t.a.x, t.a.y);
     }
 }
 
@@ -332,6 +333,7 @@ static void delaunay(SDL_Renderer* const renderer, const Points ps, const int w,
     }
     // Draw all triangles.
     draw(renderer, w, h, tris, regular);
+    puts("done");
 }
 
 static Points psnew(const int max)
@@ -372,6 +374,7 @@ int main(int argc, char* argv[])
     const int h = surface->h;
     SDL_CreateWindowAndRenderer(w, h, 0, &window, &renderer);
     const uint8_t* key = SDL_GetKeyboardState(NULL);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
     // Before we get to the delaunay triangles,
     // the image is first blurred, then grey scaled, then sobel filtered for edge detection,
     // and then finally netted with a threshold [0, 255] to yield more or less triangles.
