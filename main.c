@@ -149,12 +149,12 @@ static uint32_t conv(uint32_t* p, const int x, const int y, const int w, const i
         (0xFF & k[2][2] * (p[(x + 1) + (y + 1) * w] >> s))) / 9.0f;
 }
 
-static uint32_t* blur(uint32_t* p, const int w, const int h)
+static uint32_t* blur(uint32_t* const p, const int w, const int h)
 {
     const int k[3][3] = {
-        { 1, 1, 1 },
-        { 1, 1, 1 },
-        { 1, 1, 1 },
+        { 1, 2, 1 },
+        { 2, 4, 2 },
+        { 1, 2, 1 },
     };
     const int bytes = sizeof(*p) * w * h;
     uint32_t* out = (uint32_t*) memcpy(malloc(bytes), p, bytes);
@@ -167,7 +167,7 @@ static uint32_t* blur(uint32_t* p, const int w, const int h)
     return out;
 }
 
-static uint32_t* grey(uint32_t* p, const int w, const int h)
+static uint32_t* grey(uint32_t* const p, const int w, const int h)
 {
     const int bytes = sizeof(*p) * w * h;
     uint32_t* out = (uint32_t*) memcpy(malloc(bytes), p, bytes);
@@ -185,7 +185,7 @@ static uint32_t* grey(uint32_t* p, const int w, const int h)
     return out;
 }
 
-static uint32_t* soblx(uint32_t* p, const int w, const int h)
+static uint32_t* soblx(uint32_t* const p, const int w, const int h)
 {
     const int k[3][3] = {
         { -1, 0, 1 },
@@ -203,7 +203,7 @@ static uint32_t* soblx(uint32_t* p, const int w, const int h)
     return out;
 }
 
-static uint32_t* sobly(uint32_t* p, const int w, const int h)
+static uint32_t* sobly(uint32_t* const p, const int w, const int h)
 {
     const int k[3][3] = {
         {  1,  2,  1 },
@@ -221,7 +221,7 @@ static uint32_t* sobly(uint32_t* p, const int w, const int h)
     return out;
 }
 
-static uint32_t* sobl(uint32_t* p, const int w, const int h)
+static uint32_t* sobl(uint32_t* const p, const int w, const int h)
 {
     uint32_t* sx = soblx(p, w, h);
     uint32_t* sy = sobly(p, w, h);
@@ -245,7 +245,7 @@ static uint32_t* sobl(uint32_t* p, const int w, const int h)
     return out;
 }
 
-static uint32_t* nett(uint32_t* p, const int w, const int h, const uint32_t thresh)
+static uint32_t* nett(uint32_t* const p, const int w, const int h, const uint32_t thresh)
 {
     const int bytes = sizeof(*p) * w * h;
     uint32_t* out = (uint32_t*) memcpy(malloc(bytes), p, bytes);
@@ -273,11 +273,13 @@ static void draw(SDL_Renderer* const renderer, const int w, const int h, const T
     for(int i = 0; i < tris.count; i++)
     {
         const Tri t = tris.tri[i];
-        const int x = t.a.x + (t.b.x - t.a.x) / 2.0f;
-        const int y = t.b.y + (t.c.y - t.b.y) / 2.0f;
+        const int x = (t.a.x + t.b.x + t.c.x) / 3.0f;
+        const int y = (t.a.y + t.b.y + t.c.y) / 3.0f;
         const uint32_t color = outob(x, y, w, h) ? 0x00 : regular[x + y * w];
-        filledTrigonColor(renderer,
-                t.a.x, t.a.y, t.b.x, t.b.y, t.c.x, t.c.y,
+        aatrigonColor(renderer,
+                t.a.x, t.a.y,
+                t.b.x, t.b.y,
+                t.c.x, t.c.y,
                 // Force alpha to opaque just incase its completely transparent.
                 (0xFF << 24) | color);
     }
@@ -368,11 +370,11 @@ int main(int argc, char* argv[])
     // the image is first blurred, then grey scaled, then sobel filtered for edge detection,
     // and then finally netted with a threshold [0, 255] to yield more or less triangles.
     // The pipeline is labeled with the first few letters of hte alphabet.
-    uint32_t* a = (uint32_t*) surface->pixels;
-    uint32_t* b = blur(a, w, h);
-    uint32_t* c = grey(b, w, h);
-    uint32_t* d = sobl(c, w, h);
-    uint32_t* e = nett(d, w, h, thresh);
+    uint32_t* const a = (uint32_t*) surface->pixels;
+    uint32_t* const b = blur(a, w, h);
+    uint32_t* const c = grey(b, w, h);
+    uint32_t* const d = sobl(c, w, h);
+    uint32_t* const e = nett(d, w, h, thresh);
     const Points ps = pcollect(e, w, h, thresh);
     // Note that the original image is used for coloring delaunay triangles.
     delaunay(renderer, ps, w, h, a, key);
