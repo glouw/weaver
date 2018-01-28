@@ -12,7 +12,7 @@ Just do:
 
     make;
 
-And to use it:
+And use it:
 
     ./weaver path/to/image.bmp threshold
 
@@ -38,4 +38,4 @@ Algorithm:
 
     6. Apply all points to a Delaunay Triangle mesh.
 
-    7. Get the pixel color at the center of the triangle of the original image and color the triangle edges.
+    7. For all triangles, get pixel color of original image at triangle center and color triangle edges.
