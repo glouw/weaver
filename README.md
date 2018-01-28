@@ -10,7 +10,7 @@ Assuming you have the following installed:
 
 Just do:
 
-    make;
+    make
 
 And use it:
 
