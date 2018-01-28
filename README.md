@@ -20,7 +20,7 @@ Play with threshold (0-255) for weave intensity. Intense weaves take a long time
 
 Hit END to stop weaving early. END again to exit.
 
-![screenshot](scrots/kvothe.PNG)
+![screenshot](img/kvothe.png)
 
 Algorithm:
 
