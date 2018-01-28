@@ -129,6 +129,11 @@ static Tris ejoin(Tris tris, const Tris edges, const Point p)
 static SDL_Surface* load(const char* const path)
 {
     SDL_Surface* const bmp = SDL_LoadBMP(path);
+    if(!bmp)
+    {
+        puts(SDL_GetError());
+        exit(1);
+    }
     SDL_PixelFormat* const allocation = SDL_AllocFormat(SDL_PIXELFORMAT_ABGR8888);
     SDL_Surface* const converted = SDL_ConvertSurface(bmp, allocation, 0);
     return converted;
@@ -287,7 +292,7 @@ static void draw(SDL_Renderer* const renderer, const int w, const int h, const T
 
 static void delaunay(SDL_Renderer* const renderer, const Points ps, const int w, const int h, uint32_t* regular, const uint8_t* key)
 {
-    const int size = w * h / 3; /* "Big enough" rough approximation. */
+    const int size = w * h / 2; /* "Big enough" rough approximation. */
     Tris in = tsnew(size);
     Tris out = tsnew(size);
     Tris tris = tsnew(size);
@@ -380,6 +385,6 @@ int main(int argc, char* argv[])
     delaunay(renderer, ps, w, h, a, key);
     // Present and wait for the user to hit the END key.
     SDL_RenderPresent(renderer);
-    do { SDL_PumpEvents(); } while(!key[SDL_SCANCODE_END]);
+    do { SDL_PumpEvents(), SDL_Delay(10); } while(!key[SDL_SCANCODE_END]);
     // No need to free hoisted memory - gives a fast exit.
 }
