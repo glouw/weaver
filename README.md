@@ -1,4 +1,4 @@
-# weaver
+![screenshot](img/logo.png)
 
 Weaver weaves a spider tapesty of your favorite bitmap image.
 
