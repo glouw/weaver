@@ -300,7 +300,7 @@ static void draw(SDL_Renderer* const renderer, const int w, const int h, const T
     }
 }
 
-static void delaunay(SDL_Renderer* const renderer, const Points ps, const int w, const int h, uint32_t* regular, const uint8_t* key)
+static void delaunay(SDL_Renderer* const renderer, const Points ps, const int w, const int h, uint32_t* regular)
 {
     const int size = w * h / 2; /* "Big enough" rough approximation. */
     Tris in = tsnew(size);
@@ -312,8 +312,9 @@ static void delaunay(SDL_Renderer* const renderer, const Points ps, const int w,
     tris = tsadd(tris, super);
     for(int j = 0; j < ps.count; j++)
     {
-        SDL_PumpEvents();
-        if(key[SDL_SCANCODE_END])
+        SDL_Event event;
+        SDL_PollEvent(&event);
+        if(event.type == SDL_QUIT || event.type == SDL_KEYUP)
             break;
         in.count = out.count = edges.count = 0;
         const Point p = ps.point[j];
@@ -381,7 +382,6 @@ int main(int argc, char* argv[])
     const int w = surface->w;
     const int h = surface->h;
     SDL_CreateWindowAndRenderer(w, h, 0, &window, &renderer);
-    const uint8_t* key = SDL_GetKeyboardState(NULL);
     // Before we get to the delaunay triangles,
     // the image is first blurred, then grey scaled, then sobel filtered for edge detection,
     // and then finally netted with a threshold [0, 255] to yield more or less triangles.
@@ -393,9 +393,15 @@ int main(int argc, char* argv[])
     uint32_t* const e = nett(d, w, h, thresh);
     const Points ps = pcollect(e, w, h, thresh);
     // Note that the original image is used for coloring delaunay triangles.
-    delaunay(renderer, ps, w, h, a, key);
+    delaunay(renderer, ps, w, h, a);
     // Present and wait for the user to hit the END key.
     SDL_RenderPresent(renderer);
-    do { SDL_PumpEvents(), SDL_Delay(10); } while(!key[SDL_SCANCODE_END]);
+    SDL_Event event;
+    do
+    {
+        SDL_PollEvent(&event);
+        SDL_Delay(10);
+    }
+    while(event.type != SDL_KEYUP && event.type != SDL_QUIT);
     // No need to free hoisted memory - gives a fast exit.
 }
