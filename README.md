@@ -12,9 +12,12 @@ Just do:
 
     make; ./weaver path/to/image.bmp threshold
 
-    Note: threshold (0-255) determines number of generated triangles.
+Play with threshold (0-255) for weave intensity. Intense weaves take a long time.
 
-Hit END to stop the process early. END again to exit.
+Hit END to stop weaving early. END again to exit.
 
-![screenshot](scrots/2018-01-27-211457_600x768_scrot.png)
+The Butcher of Blaviken
 ![screenshot](scrots/2018-01-27-215638_832x768_scrot.png)
+
+Kvothe, son of Arliden
+![screenshot](scrots/2018-01-27-211457_600x768_scrot.png)
