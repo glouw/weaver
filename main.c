@@ -286,9 +286,13 @@ static void draw(SDL_Renderer* const renderer, const int w, const int h, const T
         const uint32_t b = (color >> 0x10) & 0xFF;
         const uint32_t a = 0xFF;
         SDL_SetRenderDrawColor(renderer, r, g, b, a);
-        SDL_RenderDrawLine(renderer, t.a.x, t.a.y, t.b.x, t.b.y);
-        SDL_RenderDrawLine(renderer, t.b.x, t.b.y, t.c.x, t.c.y);
-        SDL_RenderDrawLine(renderer, t.c.x, t.c.y, t.a.x, t.a.y);
+        const SDL_Point points[] = {
+            { t.a.x, t.a.y },
+            { t.b.x, t.b.y },
+            { t.c.x, t.c.y },
+            { t.a.x, t.a.y },
+        };
+        SDL_RenderDrawLines(renderer, points, 4);
     }
 }
 
@@ -366,6 +370,7 @@ int main(int argc, char* argv[])
         puts("weaver path/to/image threshold");
         return 1;
     }
+    SDL_SetHintWithPriority(SDL_HINT_RENDER_SCALE_QUALITY, "linear", SDL_HINT_OVERRIDE);
     SDL_Surface* surface = load(argv[1]);
     const uint32_t thresh = atoi(argv[2]);
     SDL_Window* window;
@@ -374,7 +379,6 @@ int main(int argc, char* argv[])
     const int h = surface->h;
     SDL_CreateWindowAndRenderer(w, h, 0, &window, &renderer);
     const uint8_t* key = SDL_GetKeyboardState(NULL);
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
     // Before we get to the delaunay triangles,
     // the image is first blurred, then grey scaled, then sobel filtered for edge detection,
     // and then finally netted with a threshold [0, 255] to yield more or less triangles.
