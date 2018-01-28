@@ -236,8 +236,8 @@ static uint32_t* sobl(uint32_t* const p, const int w, const int h)
     uint32_t* sy = sobly(p, w, h);
     const int bytes = sizeof(*p) * w * h;
     uint32_t* out = (uint32_t*) memcpy(malloc(bytes), p, bytes);
-    for(int x = 1; x < w - 1; x++)
     for(int y = 1; y < h - 1; y++)
+    for(int x = 1; x < w - 1; x++)
     {
         // Sobel magnitude is computed with the magnitude of each color.
         const uint32_t rx = 0xFF & (sx[x + y * w] >> 0x10);
@@ -258,8 +258,8 @@ static uint32_t* nett(uint32_t* const p, const int w, const int h, const uint32_
 {
     const int bytes = sizeof(*p) * w * h;
     uint32_t* out = (uint32_t*) memcpy(malloc(bytes), p, bytes);
-    for(int x = 1; x < w - 1; x++)
     for(int y = 1; y < h - 1; y++)
+    for(int x = 1; x < w - 1; x++)
     {
         const uint32_t r = 0xFF & (p[x + y * w] >> 0x10);
         const uint32_t g = 0xFF & (p[x + y * w] >> 0x08);
@@ -355,8 +355,8 @@ static Points pcollect(uint32_t* netted, const int w, const int h, const uint32_
 {
     const int max = w * h;
     Points ps = psnew(max);
-    for(int x = 1; x < w - 1; x++)
     for(int y = 1; y < h - 1; y++)
+    for(int x = 1; x < w - 1; x++)
         if(netted[x + w * y] > thresh)
         {
             const Point p = {

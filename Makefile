@@ -30,10 +30,10 @@ CFLAGS+= -Ofast -march=native
 ifdef ComSpec
 	# Windows requires additional SDL2main library.
 	#  in the exe folder.
-	LDFLAGS = -L. -lm -lSDL2main -lSDL2 -lSDL2_image
+	LDFLAGS = -Isystem. -L. -lm -lSDL2main -lSDL2 -lSDL2_image
 else
 	LDFLAGS = -lm -lSDL2 -lSDL2_image
-endif 
+endif
 
 # Linker.
 $(PROJ): $(SRCS:.c=.o)
