@@ -6,8 +6,6 @@ Assuming you have the following installed:
 
     SDL2
 
-    SDL2_gfx
-
     SDL2_image
 
 Just do:
