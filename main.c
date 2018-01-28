@@ -370,7 +370,6 @@ int main(int argc, char* argv[])
         puts("weaver path/to/image threshold");
         return 1;
     }
-    SDL_SetHintWithPriority(SDL_HINT_RENDER_SCALE_QUALITY, "linear", SDL_HINT_OVERRIDE);
     SDL_Surface* surface = load(argv[1]);
     const uint32_t thresh = atoi(argv[2]);
     SDL_Window* window;
