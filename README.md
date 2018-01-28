@@ -1,6 +1,6 @@
 ![screenshot](img/weaver.png)
 
-Weaver weaves a spider tapesty of your favorite bitmap image.
+Weaver weaves a spider tapestry of your favorite bitmap image.
 
 Assuming you have the following installed:
 
