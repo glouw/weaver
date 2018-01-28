@@ -1,6 +1,6 @@
 ![screenshot](img/weaver.png)
 
-Weaver weaves a spider tapestry of your favorite bitmap image.
+Weaver weaves a spider tapestry of your favorite image.
 
 Assuming you have the following installed:
 
@@ -8,13 +8,15 @@ Assuming you have the following installed:
 
     SDL2_gfx
 
+    SDL2_image
+
 Just do:
 
     make
 
 And use it:
 
-    ./weaver path/to/image.bmp threshold
+    ./weaver path/to/image.png threshold
 
 Play with threshold (0-255) for weave intensity. Intense weaves take a long time.
 

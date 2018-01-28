@@ -17,7 +17,7 @@ CFLAGS+= -g
 CFLAGS+= -Ofast -march=native
 
 # Linker flags.
-LDFLAGS = -lm -lSDL2 -lSDL2_gfx
+LDFLAGS = -lm -lSDL2 -lSDL2_gfx -lSDL2_image
 
 # Linker.
 $(PROJ): $(SRCS:.c=.o)

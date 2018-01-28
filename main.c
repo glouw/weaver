@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
+#include <SDL2/SDL_image.h>
 
 typedef struct
 {
@@ -128,14 +129,14 @@ static Tris ejoin(Tris tris, const Tris edges, const Point p)
 
 static SDL_Surface* load(const char* const path)
 {
-    SDL_Surface* const bmp = SDL_LoadBMP(path);
-    if(!bmp)
+    SDL_Surface* const img = IMG_Load(path);
+    if(!img)
     {
         puts(SDL_GetError());
         exit(1);
     }
     SDL_PixelFormat* const allocation = SDL_AllocFormat(SDL_PIXELFORMAT_ABGR8888);
-    SDL_Surface* const converted = SDL_ConvertSurface(bmp, allocation, 0);
+    SDL_Surface* const converted = SDL_ConvertSurface(img, allocation, 0);
     return converted;
 }
 
