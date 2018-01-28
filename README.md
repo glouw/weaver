@@ -20,6 +20,8 @@ Play with threshold (0-255) for weave intensity. Intense weaves take a long time
 
 Hit END to stop weaving early. END again to exit.
 
+![screenshot](scrots/2018-01-27-215638_832x768_scrot.png)
+
 Algorithm:
 
     0. Take an image.
@@ -37,8 +39,3 @@ Algorithm:
     6. Apply all points to a Delaunay Triangle mesh.
 
     7. Get the pixel color at the center of the triangle of the original image and color the triangle edges.
-
-![screenshot](scrots/2018-01-27-215638_832x768_scrot.png)
-
-![screenshot](scrots/2018-01-27-211457_600x768_scrot.png)
-
