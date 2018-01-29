@@ -1,13 +1,3 @@
-# Portable aliases.
-# CompSec defined if in Windows.
-ifdef ComSpec
-	RM = del /F /Q
-	MV = ren
-else
-	RM = rm -f
-	MV = mv -f
-endif
-
 # Compiler and standard.
 CC = gcc -std=c99
 
@@ -18,7 +8,7 @@ PROJ = weaver
 SRCS = main.c
 
 # Warnings flags.
-CFLAGS = -Wshadow -Wall -Wpedantic -Wextra -Wdouble-promotion
+CFLAGS+= -Wshadow -Wall -Wpedantic -Wextra -Wdouble-promotion
 
 # Debugging flags.
 CFLAGS+= -g
@@ -27,13 +17,7 @@ CFLAGS+= -g
 CFLAGS+= -Ofast -march=native
 
 # Linker flags.
-ifdef ComSpec
-	# Windows requires additional SDL2main library.
-	#  in the exe folder.
-	LDFLAGS = -Isystem. -L. -lm -lSDL2main -lSDL2 -lSDL2_image
-else
-	LDFLAGS = -lm -lSDL2 -lSDL2_image
-endif
+LDFLAGS = -lm -lSDL2 -lSDL2_image
 
 # Linker.
 $(PROJ): $(SRCS:.c=.o)
@@ -42,16 +26,16 @@ $(PROJ): $(SRCS:.c=.o)
 # Compiler template; generates dependency targets.
 %.o : %.c
 	$(CC) $(CFLAGS) -MMD -MP -MT $@ -MF $*.td -c $<
-	$(MV) $*.td $*.d
-	
+	@mv -f $*.td $*.d
+
 # All dependency targets.
 %.d: ;
 -include *.d
 
 clean:
-	$(RM) vgcore.*
-	$(RM) cachegrind.out.*
-	$(RM) callgrind.out.*
-	$(RM) $(PROJ)
-	$(RM) $(SRCS:.c=.o)
-	$(RM) $(SRCS:.c=.d)
+	rm -f vgcore.*
+	rm -f cachegrind.out.*
+	rm -f callgrind.out.*
+	rm -f $(PROJ)
+	rm -f $(SRCS:.c=.o)
+	rm -f $(SRCS:.c=.d)
