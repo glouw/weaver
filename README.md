@@ -2,6 +2,8 @@
 
 Weaver weaves a spider tapestry of your favorite image.
 
+*A Windows 10 release is available*
+
 Assuming you have the following installed:
 
     SDL2
