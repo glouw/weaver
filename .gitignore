@@ -53,3 +53,10 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+weaver-1.0/lics/LICENSE.jpeg.txt
+weaver-1.0/lics/LICENSE.png.txt
+weaver-1.0/lics/LICENSE.sdl2.txt
+weaver-1.0/lics/LICENSE.tiff.txt
+weaver-1.0/lics/LICENSE.webp.txt
+weaver-1.0/lics/LICENSE.zlib.txt
+weaver-1.0/README.txt

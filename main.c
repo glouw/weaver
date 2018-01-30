@@ -291,10 +291,10 @@ static void draw(SDL_Renderer* const renderer, const int w, const int h, const T
         const uint32_t a = 0xFF;
         SDL_SetRenderDrawColor(renderer, r, g, b, a);
         const SDL_Point points[] = {
-            { t.a.x, t.a.y },
-            { t.b.x, t.b.y },
-            { t.c.x, t.c.y },
-            { t.a.x, t.a.y },
+            { (int) t.a.x, (int) t.a.y },
+            { (int) t.b.x, (int) t.b.y },
+            { (int) t.c.x, (int) t.c.y },
+            { (int) t.a.x, (int) t.a.y },
         };
         SDL_RenderDrawLines(renderer, points, 4);
     }
@@ -404,4 +404,5 @@ int main(int argc, char* argv[])
     }
     while(event.type != SDL_KEYUP && event.type != SDL_QUIT);
     // No need to free hoisted memory - gives a fast exit.
+    return 0;
 }
