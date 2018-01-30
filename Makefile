@@ -20,7 +20,7 @@ endif
 CFLAGS += -std=c99
 CFLAGS += -Wshadow -Wall -Wpedantic -Wextra -Wdouble-promotion
 CFLAGS += -g
-CFLAGS += -Ofast -march=pentium4
+CFLAGS += -Ofast -march=native
 CFLAGS += -flto
 
 LDFLAGS =
