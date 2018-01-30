@@ -16,4 +16,4 @@ And then go:
 
 Play with threshold (0-255) for weave intensity. Intense weaves take a long time.
 
-![screenshot](img/kvothe.png)
+![screenshot](img/owl.png)
