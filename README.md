@@ -4,7 +4,7 @@ Weaver weaves a spider tapestry of your favorite image.
 
 *A Windows 10 release is available.*
 
-Othwerwise if you are on Unix, use your package manager to install the development packages for:
+Otherwise if you are on Unix, use your package manager to install the development packages for:
 
     SDL2
 
