@@ -143,6 +143,14 @@ static SDL_Surface* load(const char* const path)
     return converted;
 }
 
+static float divisor(const int k[3][3])
+{
+    return
+        (k[0][0] != 0) + (k[0][1] != 0) + (k[0][2] != 0) +
+        (k[1][0] != 0) + (k[1][1] != 0) + (k[1][2] != 0) +
+        (k[2][0] != 0) + (k[2][1] != 0) + (k[2][2] != 0);
+}
+
 // Convolution - requires a 3x3 kernel.
 static uint32_t conv(uint32_t* p, const int x, const int y, const int w, const int s, const int k[3][3])
 {
@@ -155,7 +163,7 @@ static uint32_t conv(uint32_t* p, const int x, const int y, const int w, const i
         (0xFF & k[1][2] * (p[(x + 1) + (y - 0) * w] >> s)) +
         (0xFF & k[2][0] * (p[(x - 1) + (y + 1) * w] >> s)) +
         (0xFF & k[2][1] * (p[(x - 0) + (y + 1) * w] >> s)) +
-        (0xFF & k[2][2] * (p[(x + 1) + (y + 1) * w] >> s))) / 9.0f;
+        (0xFF & k[2][2] * (p[(x + 1) + (y + 1) * w] >> s))) / divisor(k);
 }
 
 static uint32_t* blur(uint32_t* const p, const int w, const int h)
