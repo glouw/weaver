@@ -7,7 +7,7 @@ SRCS = main.c
 ifdef ComSpec
 	BIN = $(NAME).exe
 else
-	BIN = NAME
+	BIN = $(NAME)
 endif
 
 CFLAGS =
@@ -50,8 +50,8 @@ $(BIN): $(SRCS:.c=.o)
 # Compile.
 %.o : %.c
 	$(CC) $(CFLAGS) -MMD -MP -MT $@ -MF $*.td -c $<
-	$(RM) $*.d
-	$(MV) $*.td $*.d
+	@$(RM) $*.d
+	@$(MV) $*.td $*.d
 %.d: ;
 -include *.d
 
