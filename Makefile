@@ -25,7 +25,6 @@ CFLAGS += -flto
 
 LDFLAGS =
 ifdef ComSpec
-	LDFLAGS += -static-libgcc
 	LDFLAGS += -L..\SDL2_image-2.0.2\i686-w64-mingw32\lib
 	LDFLAGS += -L..\SDL2-2.0.7\i686-w64-mingw32\lib
 	LDFLAGS += -lmingw32
