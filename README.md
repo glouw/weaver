@@ -1,4 +1,4 @@
-![screenshot](img/logo.png)
+![screenshot](img/weaver.png)
 
 Weaver weaves a spider tapestry of your favorite image.
 
