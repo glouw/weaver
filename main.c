@@ -37,7 +37,9 @@ typedef struct
 }
 Points;
 
-const Point zero = { 0.0f, 0.0f }, one = { 1.0f, 1.0f };
+const Point zer = { 0.0f, 0.0f };
+
+const Point one = { 1.0f, 1.0f };
 
 static Tris tsnew(const int max)
 {
@@ -82,9 +84,9 @@ static Tris ecollect(Tris edges, const Tris in)
     for(int i = 0; i < in.count; i++)
     {
         const Tri tri = in.tri[i];
-        const Tri ab = { tri.a, tri.b, zero };
-        const Tri bc = { tri.b, tri.c, zero };
-        const Tri ca = { tri.c, tri.a, zero };
+        const Tri ab = { tri.a, tri.b, zer };
+        const Tri bc = { tri.b, tri.c, zer };
+        const Tri ca = { tri.c, tri.a, zer };
         edges = tsadd(edges, ab);
         edges = tsadd(edges, bc);
         edges = tsadd(edges, ca);
@@ -122,7 +124,7 @@ static Tris ejoin(Tris tris, const Tris edges, const Point p)
     for(int j = 0; j < edges.count; j++)
     {
         const Tri edge = edges.tri[j];
-        if(peql(edge.c, zero))
+        if(peql(edge.c, zer))
         {
             const Tri tri = { edge.a, edge.b, p };
             tris = tsadd(tris, tri);
@@ -159,36 +161,44 @@ static uint32_t conv(uint32_t* p, const int x, const int y, const int w, const i
         (k[2][2] * (0xFF & (p[(x + 1) + (y + 1) * w] >> s)));
 }
 
-static uint32_t* blur(uint32_t* const p, const int w, const int h)
+static int weight(const int k[3][3])
+{
+    return
+        k[0][0] + k[0][1] + k[0][2] +
+        k[1][0] + k[1][1] + k[1][2] +
+        k[2][0] + k[2][1] + k[2][2];
+}
+
+static uint32_t* blur(uint32_t* const in, const int w, const int h)
 {
     const int k[3][3] = {
         { 1, 2, 1 },
         { 2, 4, 2 },
         { 1, 2, 1 },
     };
-    const int bytes = sizeof(*p) * w * h;
-    uint32_t* out = (uint32_t*) memcpy(malloc(bytes), p, bytes);
+    const int bytes = sizeof(*in) * w * h;
+    uint32_t* const out = (uint32_t*) memcpy(malloc(bytes), in, bytes);
     for(int x = 1; x < w - 1; x++)
     for(int y = 1; y < h - 1; y++)
     {
-        const uint32_t b = conv(p, x, y, w, 0x10, k) / 16;
-        const uint32_t g = conv(p, x, y, w, 0x08, k) / 16;
-        const uint32_t r = conv(p, x, y, w, 0x00, k) / 16;
+        const uint32_t b = conv(in, x, y, w, 0x10, k) / weight(k);
+        const uint32_t g = conv(in, x, y, w, 0x08, k) / weight(k);
+        const uint32_t r = conv(in, x, y, w, 0x00, k) / weight(k);
         out[x + y * w] = (b << 0x10) | (g << 0x08) | (r << 0x00);
     }
     return out;
 }
 
-static uint32_t* grey(uint32_t* const p, const int w, const int h)
+static uint32_t* grey(uint32_t* const in, const int w, const int h)
 {
-    const int bytes = sizeof(*p) * w * h;
-    uint32_t* out = (uint32_t*) memcpy(malloc(bytes), p, bytes);
+    const int bytes = sizeof(*in) * w * h;
+    uint32_t* const out = (uint32_t*) memcpy(malloc(bytes), in, bytes);
     for(int x = 1; x < w - 1; x++)
     for(int y = 1; y < h - 1; y++)
     {
-        const uint32_t lb = 0.21 * (0xFF & (p[x + y * w] >> 0x10));
-        const uint32_t lg = 0.72 * (0xFF & (p[x + y * w] >> 0x08));
-        const uint32_t lr = 0.07 * (0xFF & (p[x + y * w] >> 0x00));
+        const uint32_t lb = 0.21 * (0xFF & (in[x + y * w] >> 0x10));
+        const uint32_t lg = 0.72 * (0xFF & (in[x + y * w] >> 0x08));
+        const uint32_t lr = 0.07 * (0xFF & (in[x + y * w] >> 0x00));
         const uint32_t lum = lb + lg + lr;
         out[x + y * w]  = lum << 0x00;
         out[x + y * w] |= lum << 0x08;
@@ -207,7 +217,15 @@ static uint32_t max(uint32_t* out, const int w, const int h)
     return max;
 }
 
-static uint32_t* sobl(uint32_t* const p, const int w, const int h)
+static void normalize(uint32_t* const in, const int w, const int h)
+{
+    const uint32_t mx = max(in, w, h);
+    for(int x = 1; x < w - 1; x++)
+    for(int y = 1; y < h - 1; y++)
+        in[x + y * w] = 255 * in[x + y * w] / (float) mx;
+}
+
+static uint32_t* sobl(uint32_t* const in, const int w, const int h)
 {
     const int kx[3][3] = {
         { -1, 0, 1 },
@@ -219,41 +237,16 @@ static uint32_t* sobl(uint32_t* const p, const int w, const int h)
         {  0,  0,  0 },
         { -1, -2, -1 },
     };
-    const int bytes = sizeof(*p) * w * h;
-    uint32_t* out = (uint32_t*) memcpy(malloc(bytes), p, bytes);
+    const int bytes = sizeof(*in) * w * h;
+    uint32_t* const out = (uint32_t*) memcpy(malloc(bytes), in, bytes);
     for(int x = 1; x < w - 1; x++)
     for(int y = 1; y < h - 1; y++)
     {
-        const int vx = conv(p, x, y, w, 0x00, kx);
-        const int vy = conv(p, x, y, w, 0x00, ky);
+        const int vx = conv(in, x, y, w, 0x00, kx);
+        const int vy = conv(in, x, y, w, 0x00, ky);
         out[x + y * w] = (uint32_t) sqrtf(vx * vx + vy * vy);
     }
-    // Normalize.
-    const uint32_t mx = max(out, w, h);
-    for(int x = 1; x < w - 1; x++)
-    for(int y = 1; y < h - 1; y++)
-    {
-        const int val = 255 * out[x + y * w] / (float) mx;
-        out[x + y * w] = (val << 0x10) | (val << 0x08) | val;
-    }
-    return out;
-}
-
-static uint32_t* nett(uint32_t* const p, const int w, const int h, const uint32_t thresh)
-{
-    const int bytes = sizeof(*p) * w * h;
-    uint32_t* out = (uint32_t*) memcpy(malloc(bytes), p, bytes);
-    for(int y = 1; y < h - 1; y++)
-    for(int x = 1; x < w - 1; x++)
-    {
-        const uint32_t r = 0xFF & (p[x + y * w] >> 0x10);
-        const uint32_t g = 0xFF & (p[x + y * w] >> 0x08);
-        const uint32_t b = 0xFF & (p[x + y * w] >> 0x00);
-        out[x + y * w] =
-            (r < thresh ? 0x00 : r > thresh ? 0xFF : r) << 0x10 |
-            (g < thresh ? 0x00 : r > thresh ? 0xFF : g) << 0x08 |
-            (b < thresh ? 0x00 : r > thresh ? 0xFF : b) << 0x00;
-    }
+    normalize(out, w, h);
     return out;
 }
 
@@ -264,6 +257,8 @@ static int outob(const int x, const int y, const int w, const int h)
 
 static void draw(SDL_Renderer* const renderer, const int w, const int h, const Tris tris, uint32_t* regular)
 {
+    SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0x0);
+    SDL_RenderClear(renderer);
     for(int i = 0; i < tris.count; i++)
     {
         const Tri t = tris.tri[i];
@@ -281,7 +276,6 @@ static void draw(SDL_Renderer* const renderer, const int w, const int h, const T
             { (int) t.c.x, (int) t.c.y },
             { (int) t.a.x, (int) t.a.y },
         };
-        if(outob(points[3].x, points[3].y, w, h)) continue2
         SDL_RenderDrawLines(renderer, points, 4);
     }
     SDL_RenderPresent(renderer);
@@ -324,12 +318,8 @@ static void delaunay(SDL_Renderer* const renderer, const Points ps, const int w,
         // Update triangle list.
         tris = out;
         // Loading bar.
-        if(j % 1000 == 0)
-        {
-            SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0x0);
-            SDL_RenderClear(renderer);
+        if(j % 100 == 0)
             draw(renderer, w, h, tris, regular);
-        }
     }
 }
 
@@ -339,13 +329,13 @@ static Points psnew(const int max)
     return ps;
 }
 
-static Points pcollect(uint32_t* netted, const int w, const int h, const uint32_t thresh)
+static Points pcollect(uint32_t* in, const int w, const int h, const uint32_t thresh)
 {
     const int max = w * h;
     Points ps = psnew(max);
     for(int y = 1; y < h - 1; y++)
     for(int x = 1; x < w - 1; x++)
-        if(netted[x + w * y] > thresh)
+        if(in[x + y * w] > thresh)
         {
             const Point p = {
                 (float) x,
@@ -370,55 +360,16 @@ int main(int argc, char* argv[])
     const int w = surface->w;
     const int h = surface->h;
     SDL_CreateWindowAndRenderer(w, h, 0, &window, &renderer);
-    // Before we get to the delaunay triangles,
-    // the image is first blurred, then grey scaled, then sobel filtered for edge detection,
-    // and then finally netted with a threshold [0, 255] to yield more or less triangles.
-    // The pipeline is labeled with the first few letters of the alphabet.
+    // The image is first blurred, then grey scaled, then sobel filtered for edge detection.
     uint32_t* const a = (uint32_t*) surface->pixels;
     uint32_t* const b = blur(a, w, h);
     uint32_t* const c = grey(b, w, h);
     uint32_t* const d = sobl(c, w, h);
-    uint32_t* const e = nett(d, w, h, thresh);
-
-    surface->pixels = a;
-    SDL_Texture* ta = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_RenderCopy(renderer, ta, NULL, NULL);
-    SDL_RenderPresent(renderer);
-    
-    SDL_Delay(250);
-
-    surface->pixels = b;
-    SDL_Texture* tb = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_RenderCopy(renderer, tb, NULL, NULL);
-    SDL_RenderPresent(renderer);
-
-    SDL_Delay(250);
-
-    surface->pixels = c;
-    SDL_Texture* tc = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_RenderCopy(renderer, tc, NULL, NULL);
-    SDL_RenderPresent(renderer);
-
-    SDL_Delay(250);
-
-    surface->pixels = d;
-    SDL_Texture* td = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_RenderCopy(renderer, td, NULL, NULL);
-    SDL_RenderPresent(renderer);
-
-    SDL_Delay(1000);
-
-    surface->pixels = e;
-    SDL_Texture* te = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_RenderCopy(renderer, te, NULL, NULL);
-    SDL_RenderPresent(renderer);
-
-    SDL_Delay(1000);
-
-    const Points ps = pcollect(e, w, h, thresh);
+    // Collect all points - Higher thresholds yield fewer points.
+    const Points ps = pcollect(d, w, h, thresh);
     // Note that the original image is used for coloring delaunay triangles.
     delaunay(renderer, ps, w, h, a);
-    // Present and wait for the user to hit the END key.
+    // Present and wait.
     SDL_RenderPresent(renderer);
     SDL_Event event;
     do
