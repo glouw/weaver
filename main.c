@@ -200,9 +200,7 @@ static uint32_t* grey(uint32_t* const in, const int w, const int h)
         const uint32_t lg = 0.72 * (0xFF & (in[x + y * w] >> 0x08));
         const uint32_t lr = 0.07 * (0xFF & (in[x + y * w] >> 0x00));
         const uint32_t lum = lb + lg + lr;
-        out[x + y * w]  = lum << 0x00;
-        out[x + y * w] |= lum << 0x08;
-        out[x + y * w] |= lum << 0x10;
+        out[x + y * w] = (lum << 0x10) | (lum << 0x08) | (lum << 0x00);
     }
     return out;
 }
@@ -276,14 +274,14 @@ static void draw(SDL_Renderer* const renderer, const int w, const int h, const T
             { (int) t.c.x, (int) t.c.y },
             { (int) t.a.x, (int) t.a.y },
         };
-        SDL_RenderDrawLines(renderer, points, 4);
+        SDL_RenderDrawLines(renderer, points, sizeof(points) / sizeof(*points));
     }
     SDL_RenderPresent(renderer);
 }
 
-static void delaunay(SDL_Renderer* const renderer, const Points ps, const int w, const int h, uint32_t* regular)
+static void deltri(SDL_Renderer* const renderer, const Points ps, const int w, const int h, uint32_t* regular)
 {
-    const int size = w * h / 2; /* "Big enough" rough approximation. */
+    const int size = w * h;
     Tris in = tsnew(size);
     Tris out = tsnew(size);
     Tris tris = tsnew(size);
@@ -370,7 +368,7 @@ int main(int argc, char* argv[])
     // Collect all points - Higher thresholds yield fewer points.
     const Points ps = pcollect(d, w, h, thresh);
     // Note that the original image is used for coloring delaunay triangles.
-    delaunay(renderer, ps, w, h, a);
+    deltri(renderer, ps, w, h, a);
     puts("done");
     // Present and wait.
     SDL_Event event;
