@@ -360,6 +360,7 @@ int main(int argc, char* argv[])
     const int w = surface->w;
     const int h = surface->h;
     SDL_CreateWindowAndRenderer(w, h, 0, &window, &renderer);
+    SDL_SetWindowTitle(window, "Weaver-1.2");
     // The image is first blurred, then grey scaled, then sobel filtered for edge detection.
     uint32_t* const a = (uint32_t*) surface->pixels;
     uint32_t* const b = blur(a, w, h);
