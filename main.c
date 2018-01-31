@@ -321,6 +321,8 @@ static void delaunay(SDL_Renderer* const renderer, const Points ps, const int w,
         if(j % 100 == 0)
             draw(renderer, w, h, tris, regular);
     }
+    // Flush.
+    draw(renderer, w, h, tris, regular);
 }
 
 static Points psnew(const int max)
@@ -369,8 +371,8 @@ int main(int argc, char* argv[])
     const Points ps = pcollect(d, w, h, thresh);
     // Note that the original image is used for coloring delaunay triangles.
     delaunay(renderer, ps, w, h, a);
+    puts("done");
     // Present and wait.
-    SDL_RenderPresent(renderer);
     SDL_Event event;
     do
     {
