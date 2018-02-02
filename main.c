@@ -350,15 +350,15 @@ int main(int argc, char* argv[])
 {
     puts("use: path/to/image threshold");
     SDL_Surface* surface =
-        load(argc == 3 ? argv[1] : "img/reshi.jpg");
+        load(argc == 3 ? argv[1] : "img/reshi.png");
     const uint32_t thresh =
-        atoi(argc == 3 ? argv[2] : "32");
+        atoi(argc == 3 ? argv[2] : "24");
     SDL_Window* window;
     SDL_Renderer* renderer;
     const int w = surface->w;
     const int h = surface->h;
     SDL_CreateWindowAndRenderer(w, h, 0, &window, &renderer);
-    SDL_SetWindowTitle(window, "Weaver-1.2");
+    SDL_SetWindowTitle(window, "Weaver-1.3");
     // The image is first blurred, then grey scaled, then sobel filtered for edge detection.
     uint32_t* const a = (uint32_t*) surface->pixels;
     uint32_t* const b = blur(a, w, h);
