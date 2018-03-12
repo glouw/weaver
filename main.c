@@ -293,7 +293,7 @@ static void deltri(SDL_Renderer* const renderer, const Points ps, const int w, c
     {
         SDL_Event event;
         SDL_PollEvent(&event);
-        if(event.type == SDL_QUIT || event.type == SDL_KEYUP)
+        if(event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE)
             break;
         in.count = out.count = edges.count = 0;
         const Point p = ps.point[j];

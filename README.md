@@ -2,18 +2,14 @@
 
 Weaver weaves a spider tapestry of your favorite image.
 
-*A Windows 10 release is available.*
+    make; ./weaver path/to/image.png threshold
 
-Otherwise if you are on Unix, use your package manager to install the development packages for:
+Dependencies:
 
     SDL2-devel
 
     SDL2_image
 
-And then go:
-
-    make; ./weaver path/to/image.png threshold
-
 Play with threshold (0-255) for weave intensity. Intense weaves take a long time.
 
-![screenshot](img/geralt.png)
+![screenshot](img/geralt.gif)
