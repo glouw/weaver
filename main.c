@@ -348,11 +348,13 @@ static Points pcollect(uint32_t* in, const int w, const int h, const uint32_t th
 
 int main(int argc, char* argv[])
 {
-    puts("use: path/to/image threshold");
-    SDL_Surface* surface =
-        load(argc == 3 ? argv[1] : "img/reshi.png");
-    const uint32_t thresh =
-        atoi(argc == 3 ? argv[2] : "24");
+    if(argc != 3)
+    {
+        puts("use: path/to/image threshold");
+        return 1;
+    }
+    SDL_Surface* surface = load(argv[1]);
+    const uint32_t thresh = atoi(argv[2]);
     SDL_Window* window;
     SDL_Renderer* renderer;
     const int w = surface->w;
