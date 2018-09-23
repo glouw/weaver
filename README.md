@@ -8,7 +8,7 @@ Dependencies:
 
     SDL2-devel
 
-    SDL2_image
+    SDL2_image-devel
 
 Play with threshold (0-255) for weave intensity. Intense weaves take a long time.
 
